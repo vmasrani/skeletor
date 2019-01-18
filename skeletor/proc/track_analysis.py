@@ -2,7 +2,7 @@
 import os
 import track
 import pandas as pd
-
+from pathlib import Path
 
 def df_from_proj(track_proj):
     """
@@ -34,9 +34,17 @@ def proj(experimentname=None, logroot=None, s3=None,
 
     loads from s3 if it can via track.
     """
+    if logroot is None:
+        logroot = Path.cwd() / 'logs'
+    else:
+        logroot = Path(logroot)
+
+    print("Reading from:", logroot)
+
     if not proj_dir:
         if experimentname:
-            assert logroot, "must supply logroot with experiment name"
+            assert logroot.exists(), "must supply logroot with experiment name"
         proj_dir = os.path.join(logroot, experimentname)
     track_proj = track.Project(proj_dir, s3)
     return track_proj
+
