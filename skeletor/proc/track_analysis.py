@@ -48,3 +48,11 @@ def proj(experimentname=None, logroot=None, s3=None,
     track_proj = track.Project(proj_dir, s3)
     return track_proj
 
+def get_project_names(logroot=None):
+    if logroot is None:
+        logroot = Path.cwd() / 'logs'
+    else:
+        logroot = Path(logroot)
+    print("Reading from:", logroot)
+    project_names = [x.name for x in logroot.glob("*") if x.is_dir()]
+    return project_names
