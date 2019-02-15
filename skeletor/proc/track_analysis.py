@@ -9,6 +9,7 @@ def df_from_proj(track_proj):
     Gets a flattened dataframe with all trial results for the track.Project
     'proj'. See track.Project for how to get this from a logroot directory.
     """
+    print("This function is depreciated in favor of the updated project object in track, which allows project.results() to return all results")
     results = []
     for _, trial in track_proj.ids.iterrows():
         res = track_proj.results([trial['trial_id']])

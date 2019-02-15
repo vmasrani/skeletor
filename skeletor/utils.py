@@ -42,7 +42,6 @@ def seed_all(seed, numpy=True, random=True, torch=True):
         torch.manual_seed(torch_cpu_seed)
         torch.cuda.manual_seed_all(torch_gpu_seed)
 
-
 def format_time(seconds):
     days = int(seconds / 3600/24)
     seconds = seconds - days*3600*24
