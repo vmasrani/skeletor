@@ -11,6 +11,7 @@ from ray.tune import register_trainable, run_experiments
 import track
 
 import argparse
+from pathlib import Path
 import os
 import pickle
 import shutil
@@ -75,6 +76,9 @@ def _add_default_args(parser):
                         ' track records for the experiment.')
     parser.add_argument('--seed', default=1, type=int,
                         help='random seed to supply to numpy, random, torch')
+    parser.add_argument('--ray', dest='ray', action='store_true')
+    parser.add_argument('--no-ray', dest='ray', action='store_false')
+    parser.set_defaults(ray=True)
 
 
 def _experiment(experiment_fn, args):
@@ -168,6 +172,8 @@ def _cleanup_ray_experiments(args):
             rundir = os.path.join(experiment_dir, runname,
                                   'logs',
                                   args.experimentname)
+            if not Path(rundir).is_dir():
+                continue
             for f in os.listdir(rundir):
                 cur = os.path.join(rundir, f)
                 new_dst = os.path.join(track_local_dir, f)
@@ -232,9 +238,15 @@ def execute(experiment_fn):
         supply_args()
     args = _parser.val.parse_args()
     # Launch ray if we need to.
-    if args.config:
+    if args.config and args.ray:
         _launch_ray_experiments(experiment_fn, args)
         _cleanup_ray_experiments(args)
+    elif args.config and not args.ray:
+        with open(args.config) as f:
+            config = yaml.load(f)
+            args_dict = vars(args)
+            args_dict.update(config)
+        _experiment(experiment_fn, args)
     # Launch a single experiment otherwise.
     else:
         _experiment(experiment_fn, args)
